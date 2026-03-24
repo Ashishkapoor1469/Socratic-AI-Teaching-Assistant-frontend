@@ -1,8 +1,11 @@
+
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
+import Providers from "./providers";
+import PrivateRoute from "./(auth)/private/page";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'})
 
@@ -21,9 +24,14 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       className={cn("antialiased", fontMono.variable, "font-sans", geist.variable)}
+       cz-shortcut-listen="true"
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <Providers>
+          <ThemeProvider>
+            <PrivateRoute>{children}</PrivateRoute>
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )

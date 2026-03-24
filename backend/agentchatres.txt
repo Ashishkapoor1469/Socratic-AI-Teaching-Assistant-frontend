@@ -1,0 +1,26 @@
+{
+  "type": "response",
+  "persona": {
+    "mood": "curious",
+    "engagement": "medium",
+    "language_preference": "english"
+  },
+  "blocks": [
+    { "type": "text", "text": "A computer register is a small, fast storage location inside the CPU that holds data or instructions that the processor needs ins
+tantly." },
+    { "type": "analogy", "text": "Think of a register like a chef’s pantry: it stores the most frequently used ingredients (bits) right at the workstation so co
+oking (processing) can happen without running to the fridge." },
+    { "type": "key_points", "points": [
+        "Registers are part of the CPU and operate at the processor’s clock speed.",
+        "They hold binary values (bits) for arithmetic, logic, address calculations, or instruction decoding.",
+        "Typical CPUs have a few dozen general‑purpose registers and several special‑purpose ones (e.g., program counter, instruction register).",
+        "Accessing a register is much faster than accessing RAM or cache."
+      ] },
+    { "type": "resources", "items": [
+        { "label": "Wikipedia – Register (computer)", "url": "https://en.wikipedia.org/wiki/Register_(computer)" },
+        { "label": "Khan Academy – Computer Architecture", "url": "https://www.khanacademy.org/computing/computer-science/computer-architecture" },
+        { "label": "CPU Registers – HowStuffWorks", "url": "https://computer.howstuffworks.com/computer-processor.htm" }
+      ] },
+    { "type": "followup", "text": "Can you name a register that stores the address of the next instruction to execute?" }
+  ]
+}
