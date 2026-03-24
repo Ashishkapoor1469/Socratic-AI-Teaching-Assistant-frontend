@@ -281,7 +281,6 @@ export default function TestPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#212121] text-neutral-100">
-      {/* Top bar */}
       <nav className="flex h-14 items-center justify-between border-b border-white/8 px-6">
         <button
           onClick={() => router.back()}
@@ -301,7 +300,6 @@ export default function TestPage() {
         </div>
       </nav>
 
-      {/* Progress bar */}
       <div className="h-1 w-full bg-neutral-800">
         <motion.div
           className="h-full bg-blue-500"
@@ -310,7 +308,6 @@ export default function TestPage() {
         />
       </div>
 
-      {/* Question area */}
       <div className="flex flex-1 flex-col items-center px-4 py-10">
         <AnimatePresence mode="wait">
           <motion.div
@@ -321,13 +318,11 @@ export default function TestPage() {
             transition={{ duration: 0.25 }}
             className="w-full max-w-2xl"
           >
-            {/* Question */}
             <div className="mb-8">
               <p className="mb-1 text-xs text-neutral-500">Question {currentQ + 1}</p>
               <h2 className="text-xl font-semibold leading-snug text-white">{q.question}</h2>
             </div>
-
-            {/* Options */}
+            
             <div className="space-y-3">
               {q.options.map((option, idx) => {
                 let style = "border-white/10 bg-[#2a2a2a] text-neutral-200 hover:border-white/25 hover:bg-white/8"
@@ -363,7 +358,7 @@ export default function TestPage() {
               })}
             </div>
 
-            {/* Explanation + Next */}
+   
             <AnimatePresence>
               {showFeedback && (
                 <motion.div
