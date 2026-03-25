@@ -24,5 +24,5 @@ export class UserController {
         return this.userService.selectAssistant(userId, assistantmode)
     }
 
-}
+}z
 
