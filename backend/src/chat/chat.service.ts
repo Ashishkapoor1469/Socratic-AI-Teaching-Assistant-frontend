@@ -150,4 +150,17 @@ export class ChatService {
       return { message: "Internal server error", status: 500, error: e.message }
     }
   }
-}
+
+  // ── Rename a chat ──────────────────────────────────────────────────────────
+  async renameChat(chatId: string, title: string) {
+    try {
+      const chat = await this.prisma.chat.update({
+        where: { id: chatId },
+        data: { title },
+      })
+      return { message: "Chat renamed", status: 200, chat }
+    } catch (e) {
+      return { message: "Internal server error", status: 500, error: e.message }
+    }
+  }
+}

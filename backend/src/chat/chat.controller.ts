@@ -55,4 +55,11 @@ export class ChatController {
     const { chatId } = body
     return this.chatService.deleteChat(chatId)
   }
-}
+
+  // Rename a chat
+  @Post("rename")
+  async renameChat(@Body() body: { chatId: string; title: string }) {
+    const { chatId, title } = body
+    return this.chatService.renameChat(chatId, title)
+  }
+}

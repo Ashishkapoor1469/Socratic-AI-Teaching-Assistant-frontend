@@ -1,7 +1,13 @@
 import { Copy, Check } from "lucide-react"
 import { useState } from "react"
 
- export const CodeBlock = ({ inline, className, children, ...props }) => {
+import { ReactNode, HTMLAttributes } from "react"
+interface CodeBlockProps extends HTMLAttributes<HTMLElement> {
+  inline?: boolean;
+  children?: ReactNode;
+}
+
+export const CodeBlock = ({ inline, className, children, ...props }: CodeBlockProps) => {
   const [copied, setCopied] = useState(false)
 
   const codeText = String(children).replace(/\n$/, "")

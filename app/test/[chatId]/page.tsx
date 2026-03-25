@@ -15,8 +15,6 @@ import {
   AlertCircle,
 } from "lucide-react"
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface Question {
   id: number
   question: string
@@ -35,7 +33,7 @@ interface TestData {
   questions: Question[]
 }
 
-// ─── Difficulty badge ─────────────────────────────────────────────────────────
+
 
 const DifficultyBadge = ({ level }: { level: string }) => {
   const map: Record<string, string> = {
@@ -50,7 +48,6 @@ const DifficultyBadge = ({ level }: { level: string }) => {
   )
 }
 
-// ─── Results Screen ───────────────────────────────────────────────────────────
 
 const ResultsScreen = ({
   questions,
@@ -73,7 +70,7 @@ const ResultsScreen = ({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
-      {/* Score card */}
+   
       <div className="mb-8 rounded-2xl border border-white/10 bg-[#2a2a2a] p-8 text-center">
         <Trophy className="mx-auto mb-4 h-10 w-10 text-amber-400" />
         <h2 className="mb-1 text-2xl font-bold text-white">Test Complete!</h2>
@@ -83,7 +80,7 @@ const ResultsScreen = ({
           {correct} / {total} correct
         </p>
 
-        {/* Score bar */}
+   
         <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-neutral-700">
           <motion.div
             className={`h-full rounded-full ${pct >= 80 ? "bg-emerald-500" : pct >= 60 ? "bg-amber-500" : "bg-red-500"}`}
@@ -97,7 +94,7 @@ const ResultsScreen = ({
         </p>
       </div>
 
-      {/* Action buttons */}
+   
       <div className="mb-8 flex gap-3">
         <button
           onClick={() => router.back()}
@@ -113,7 +110,7 @@ const ResultsScreen = ({
         </button>
       </div>
 
-      {/* Question breakdown */}
+     
       <h3 className="mb-4 text-sm font-semibold text-neutral-400">Question Breakdown</h3>
       <div className="space-y-3">
         {questions.map((q, i) => {
@@ -158,7 +155,7 @@ const ResultsScreen = ({
   )
 }
 
-// ─── Main Quiz Page ───────────────────────────────────────────────────────────
+
 
 export default function TestPage() {
   const params = useParams()
@@ -173,7 +170,7 @@ export default function TestPage() {
   const [startTime] = useState(Date.now())
   const [elapsed, setElapsed] = useState(0)
 
-  // Load test data from sessionStorage
+ 
   useEffect(() => {
     const key = `test_${params.chatId}`
     const raw = sessionStorage.getItem(key)
@@ -190,7 +187,7 @@ export default function TestPage() {
     }
   }, [params.chatId])
 
-  // Elapsed timer
+  
   useEffect(() => {
     const interval = setInterval(() => setElapsed(Math.floor((Date.now() - startTime) / 1000)), 1000)
     return () => clearInterval(interval)
@@ -230,7 +227,7 @@ export default function TestPage() {
     setFinished(false)
   }
 
-  // ── Error state ──────────────────────────────────────────────────────────
+
 
   if (error) {
     return (
@@ -255,7 +252,6 @@ export default function TestPage() {
     )
   }
 
-  // ── Results screen ───────────────────────────────────────────────────────
 
   if (finished) {
     return (
@@ -273,7 +269,6 @@ export default function TestPage() {
     )
   }
 
-  // ── Quiz view ────────────────────────────────────────────────────────────
 
   const q = testData.questions[currentQ]
   const progress = ((currentQ + (showFeedback ? 1 : 0)) / testData.questions.length) * 100

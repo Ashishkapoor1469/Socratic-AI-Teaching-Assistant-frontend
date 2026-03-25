@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { useEffect } from "react"
 import { Loader } from "lucide-react"
 import api from "@/lib/api"
+import Image from "next/image"
 
 const publicRoutes = ["/login", "/signup"]
 
@@ -57,7 +58,14 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#212121]">
-        <Loader className="h-5 w-5 animate-spin text-neutral-500" />
+         <Image 
+                    src="/assets/logo-without.webp" 
+                    alt="Profile" 
+                    width={100}
+                    height={100}
+
+                    className="object-cover p-1 animate-pulse" 
+                  />
       </div>
     )
   }

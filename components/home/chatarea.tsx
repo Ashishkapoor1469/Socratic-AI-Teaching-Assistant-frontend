@@ -24,7 +24,6 @@ import { CodeBlock } from "./copyblock"
 import TypingLoader from "./loader"
 import { useUserStore } from "@/store/userStore"
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 type Message = {
   role: "user" | "assistant"
@@ -40,13 +39,13 @@ type Mode = {
 
 const MODES: Mode[] = [
   { id: "chat",     label: "Chat",          icon: <BookOpenText className="h-3.5 w-3.5" />, path: "stream" },
-  { id: "research", label: "Research",     icon: <FlaskConical className="h-3.5 w-3.5" />, path: "research" },
+  { id: "research", label: "Research",     icon: <FlaskConical className="h-3.5 w-3.5" />, path: "stream" },
   { id: "email",    label: "Email",        icon: <Mail className="h-3.5 w-3.5" />,         path: "stream" },
-  { id: "test",     label: "Test Mode",    icon: <TextSearch className="h-3.5 w-3.5" />,   path: "test" },
+  { id: "test",     label: "Test Mode",    icon: <TextSearch className="h-3.5 w-3.5" />,   path: "stream" },
   { id: "pdf",      label: "Deep Research",icon: <FlaskConical className="h-3.5 w-3.5" />, path: "stream" },
 ]
 
-// ─── Markdown config ──────────────────────────────────────────────────────────
+
 
 const markdownComponents: any = {
   code: CodeBlock,
@@ -77,7 +76,6 @@ const markdownComponents: any = {
   ),
 }
 
-// ─── Streaming JSON parser ────────────────────────────────────────────────────
 
 const extractStreamText = (str: string): string => {
   if (!str.trim().startsWith("{")) return str
@@ -102,7 +100,7 @@ const extractStreamText = (str: string): string => {
   }
 }
 
-// ─── Block renderers ──────────────────────────────────────────────────────────
+
 
 const BlockRenderer = ({ block, i }: { block: any; i: number }) => {
   switch (block.type) {
@@ -190,7 +188,7 @@ const MessageRenderer = ({ content, isStreaming, chatId }: { content: string; is
     } catch { /* not JSON */ }
   }
 
-  // ── Test JSON detection ──────────────────────────────────────────────────
+
   if (!isStreaming) {
     try {
       const parsed = JSON.parse(content)
@@ -207,7 +205,6 @@ const MessageRenderer = ({ content, isStreaming, chatId }: { content: string; is
   )
 }
 
-// ─── Test Summary Card ───────────────────────────────────────────────────────
 
 const TestSummaryCard = ({ data, chatId }: { data: any; chatId: string }) => {
   const router = useRouter()
@@ -225,7 +222,7 @@ const TestSummaryCard = ({ data, chatId }: { data: any; chatId: string }) => {
 
   return (
     <div className="rounded-xl border border-white/10 bg-[#2a2a2a] p-5">
-      {/* Header */}
+  
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 mb-1">Test Ready</p>
@@ -236,17 +233,17 @@ const TestSummaryCard = ({ data, chatId }: { data: any; chatId: string }) => {
         </span>
       </div>
 
-      {/* Summary */}
+     
       <p className="mb-4 text-sm leading-relaxed text-neutral-300">{data.summary}</p>
 
-      {/* Stats row */}
+    
       <div className="mb-5 flex flex-wrap gap-4 text-xs text-neutral-400">
         <span>📝 {data.questionCount || data.questions?.length || 10} questions</span>
         <span>⏱ ~{data.estimatedMinutes || 12} minutes</span>
         <span>📊 Multiple choice</span>
       </div>
 
-      {/* Start button */}
+    
       <button
         onClick={startTest}
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-sm font-semibold text-black hover:bg-neutral-200 transition-colors"
@@ -272,7 +269,7 @@ const CopyButton = ({ text }: { text: string }) => {
   )
 }
 
-// ─── Welcome screen ───────────────────────────────────────────────────────────
+
 
 const WelcomeScreen = ({ user, onPrompt }: { user: any; onPrompt: (p: string) => void }) => {
   const suggestions = [
@@ -307,7 +304,7 @@ const WelcomeScreen = ({ user, onPrompt }: { user: any; onPrompt: (p: string) =>
   )
 }
 
-// ─── Main ChatArea ────────────────────────────────────────────────────────────
+
 
 export default function ChatArea({
   messages,
@@ -327,12 +324,12 @@ export default function ChatArea({
 
   const safeMessages = Array.isArray(messages) ? messages : []
 
-  // Auto scroll to bottom
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  // Auto-resize textarea
+ 
   useEffect(() => {
     const ta = textareaRef.current
     if (!ta) return
@@ -347,7 +344,7 @@ export default function ChatArea({
     setInput("")
     setLoading(true)
 
-    // ── Test mode: non-streaming JSON quiz ───────────────────────────────────
+  
     if (selectedMode.id === "test") {
       const newMessages: Message[] = [
         ...safeMessages,
@@ -372,7 +369,7 @@ export default function ChatArea({
       return
     }
 
-    // ── Streaming mode ───────────────────────────────────────────────────────
+  
     const newMessages: Message[] = [
       ...safeMessages,
       { role: "user", content: userMessage },
@@ -408,7 +405,6 @@ export default function ChatArea({
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-[#212121]">
 
-      {/* Message list */}
       <div className="flex-1 overflow-y-auto">
         {safeMessages.length === 0 ? (
           <WelcomeScreen user={user} onPrompt={(p) => sendMessage(p)} />
@@ -430,12 +426,10 @@ export default function ChatArea({
 
               return (
                 <div key={i} className="group flex gap-4 py-4">
-                  {/* Bot avatar */}
                   <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full overflow-hidden">
                     <Image src="/assets/logo-without.webp" alt="Logo" width={28} height={28} className="object-cover" />
                   </div>
 
-                  {/* Response content */}
                   <div className="flex-1 min-w-0">
                     {isStreaming && !msg.content ? (
                       <TypingLoader />
@@ -445,7 +439,6 @@ export default function ChatArea({
                       </div>
                     )}
 
-                    {/* Action bar — shown on hover after completion */}
                     {!isStreaming && msg.content && (
                       <div className="mt-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <CopyButton text={msg.content} />
@@ -474,10 +467,10 @@ export default function ChatArea({
         )}
       </div>
 
-      {/* Input area */}
+    
       <div className="px-4 pb-4 pt-2">
         <div className="mx-auto max-w-3xl">
-          {/* Mode pills */}
+
           <div className="mb-2 flex items-center gap-1.5">
             {MODES.map((mode) => (
               <button
@@ -495,7 +488,7 @@ export default function ChatArea({
             ))}
           </div>
 
-          {/* Text input box */}
+    
           <div className="flex items-end gap-3 rounded-2xl border border-white/10 bg-[#2f2f2f] px-4 py-3 focus-within:border-white/20">
             <textarea
               ref={textareaRef}
@@ -517,7 +510,8 @@ export default function ChatArea({
             </button>
           </div>
           <p className="mt-2 text-center text-[10px] text-neutral-600">
-            AI can make mistakes. Verify important information.
+            Developer can make mistakes. 
+            <span className="text-[10px] text-white/50 ml-2 ">Created by Ashish & Sujan </span>
           </p>
         </div>
       </div>

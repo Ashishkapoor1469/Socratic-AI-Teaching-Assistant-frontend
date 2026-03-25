@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import {
@@ -9,10 +9,17 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
+  User,
   LogOut,
+  Settings,
+  Pencil,
+  Check,
+  X
 } from "lucide-react"
 import { useUserStore } from "@/store/userStore"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { renameChat } from "@/lib/api"
 
 interface Chat {
   id: string
@@ -39,6 +46,12 @@ export default function Sidebar({
 }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [editingChatId, setEditingChatId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState("")
+  const [isRenaming, setIsRenaming] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+  
   const { user, logout } = useUserStore()
   const router = useRouter()
 
@@ -46,6 +59,17 @@ export default function Sidebar({
     logout()
     router.push("/login")
   }
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   const groupChats = () => {
     const now = new Date()
@@ -70,40 +94,120 @@ export default function Sidebar({
 
   const groups = groupChats()
 
-  const ChatItem = ({ chat }: { chat: Chat }) => (
-    <div
-      className="group relative"
-      onMouseEnter={() => setHoveredId(chat.id)}
-      onMouseLeave={() => setHoveredId(null)}
-    >
-      <button
-        onClick={() => onSelectChat(chat.id)}
-        className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-          activeChatId === chat.id
-            ? "bg-white/10 text-white"
-            : "text-neutral-400 hover:bg-white/5 hover:text-white"
-        }`}
-      >
-        <MessageSquare className="h-3.5 w-3.5 shrink-0" />
-        {!collapsed && (
-          <span className="flex-1 truncate">{chat.title || "New Chat"}</span>
-        )}
-      </button>
+  const handleRename = async (e: React.MouseEvent, chatId: string, currentTitle: string) => {
+    e.stopPropagation()
+    setEditingChatId(chatId)
+    setEditTitle(currentTitle || "New Chat")
+  }
 
+  const submitRename = async (e: React.MouseEvent | React.FormEvent, chatId: string) => {
+    e.stopPropagation()
+    if (e.type === "submit") e.preventDefault()
     
-      {!collapsed && hoveredId === chat.id && (
+    if (!editTitle.trim()) {
+      setEditingChatId(null)
+      return
+    }
+
+    setIsRenaming(true)
+    try {
+      await renameChat(chatId, editTitle)
+      // Optimistically update the local chat list or trigger a refresh
+      router.refresh()
+    } catch (error) {
+      console.error("Failed to rename chat:", error)
+    } finally {
+      setIsRenaming(false)
+      setEditingChatId(null)
+    }
+  }
+
+  const cancelRename = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setEditingChatId(null)
+  }
+
+  const ChatItem = ({ chat }: { chat: Chat }) => {
+    const isEditing = editingChatId === chat.id
+
+    return (
+      <div
+        className="group relative"
+        onMouseEnter={() => setHoveredId(chat.id)}
+        onMouseLeave={() => setHoveredId(null)}
+      >
         <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onDeleteChat(chat.id)
-          }}
-          className="absolute right-2 top-2 rounded p-1 text-neutral-500 hover:text-red-400 transition-colors"
+          onClick={() => !isEditing && onSelectChat(chat.id)}
+          className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+            activeChatId === chat.id
+              ? "bg-white/10 text-white"
+              : "text-neutral-400 hover:bg-white/5 hover:text-white"
+          }`}
         >
-          <Trash2 className="h-3.5 w-3.5" />
+          <MessageSquare className="h-3.5 w-3.5 shrink-0" />
+          {!collapsed && (
+            isEditing ? (
+              <form 
+                onSubmit={(e) => submitRename(e, chat.id)} 
+                className="flex-1 flex items-center pr-12"
+              >
+                <input
+                  autoFocus
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  disabled={isRenaming}
+                  className="w-full bg-[#171717] border border-white/20 rounded px-2 py-0.5 text-xs text-white outline-none focus:border-white/40"
+                />
+              </form>
+            ) : (
+              <span className="flex-1 truncate">{chat.title || "New Chat"}</span>
+            )
+          )}
         </button>
-      )}
-    </div>
-  )
+
+      
+        {!collapsed && hoveredId === chat.id && !isEditing && (
+          <div className="absolute right-2 top-1.5 flex items-center gap-1">
+            <button
+              onClick={(e) => handleRename(e, chat.id, chat.title || "New Chat")}
+              className="rounded p-1 text-neutral-500 hover:text-white transition-colors"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onDeleteChat(chat.id)
+              }}
+              className="rounded p-1 text-neutral-500 hover:text-red-400 transition-colors"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
+
+        {isEditing && (
+          <div className="absolute right-2 top-1.5 flex items-center gap-1">
+            <button
+              onClick={(e) => submitRename(e, chat.id)}
+              disabled={isRenaming}
+              className="rounded p-1 text-green-500 hover:bg-green-500/10 transition-colors disabled:opacity-50"
+            >
+              <Check className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={cancelRename}
+              disabled={isRenaming}
+              className="rounded p-1 text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   const GroupSection = ({ label, items }: { label: string; items: Chat[] }) => {
     if (items.length === 0) return null
@@ -134,7 +238,7 @@ export default function Sidebar({
         className="absolute -right-3 top-6 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-[#212121] text-neutral-400 hover:text-white shadow-sm"
       >
         {collapsed ? (
-          <ChevronRight className="h-3 w-3" />
+          <ChevronRight className="h-3 w-3 " />
         ) : (
           <ChevronLeft className="h-3 w-3" />
         )}
@@ -178,24 +282,53 @@ export default function Sidebar({
         )}
       </div>
 
-      <div className="border-t border-white/8 px-2 py-3">
+      <div className="relative border-t border-white/8 px-2 py-3" ref={menuRef}>
+        <AnimatePresence>
+          {isUserMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute bottom-full left-2 right-2 mb-2 overflow-hidden rounded-xl border border-white/10 bg-[#212121] p-1 shadow-lg"
+            >
+              <Link
+                href="/profile"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/10 hover:text-white"
+                onClick={() => setIsUserMenuOpen(false)}
+              >
+                <Settings className="h-4 w-4" />
+                {!collapsed && <span>Profile Settings</span>}
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-500 transition-colors hover:bg-red-500/10"
+              >
+                <LogOut className="h-4 w-4" />
+                {!collapsed && <span>Log out</span>}
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <button
-          onClick={handleLogout}
+          onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
           className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-neutral-400 hover:bg-white/5 hover:text-white transition-colors ${
             collapsed ? "justify-center" : ""
-          }`}
+          } ${isUserMenuOpen ? "bg-white/5 text-white" : ""}`}
         >
           {user?.name ? (
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-600 text-xs font-bold text-white">
               {user.name[0].toUpperCase()}
             </span>
           ) : (
-            <LogOut className="h-4 w-4 shrink-0" />
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-neutral-800">
+               <User className="h-3.5 w-3.5" />
+            </div>
           )}
           {!collapsed && (
-            <span className="flex-1 truncate">{user?.name || user?.email || "Logout"}</span>
+            <span className="flex-1 truncate text-left">{user?.name || user?.email || "Profile"}</span>
           )}
-          {!collapsed && <LogOut className="h-3.5 w-3.5 text-neutral-600" />}
         </button>
       </div>
     </motion.aside>

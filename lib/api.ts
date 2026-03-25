@@ -57,12 +57,25 @@ export const TestChat = async (
   }
 }
 
-/**
- * Generate a quiz test (non-streamed, returns full JSON quiz object)
- */
+
 export const postTest = async (topic: string, chatId: string) => {
   const res = await api.post('/chat/test', { topic, chatId })
   return res.data
+}
+
+
+export const renameChat = async (chatId: string, title: string) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const res = await fetch(`${api.defaults.baseURL}/chat/rename`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "true",
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ chatId, title })
+  });
+  return res.json();
 }
 
 export default api;
