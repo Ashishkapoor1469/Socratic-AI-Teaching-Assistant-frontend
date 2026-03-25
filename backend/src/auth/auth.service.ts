@@ -36,7 +36,7 @@ export class AuthService {
                     username,
                     email,
                     password: hash,
-                    bio:""
+                    bio:`hello i'm ${name} i am a student.`
                 }
             })
 

@@ -1,12 +1,12 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common"
 import { PrismaService } from "../prisma/primsa.service"
 
- enum SelectAssistent {
-socratic,
-direct,
-creative,
-evaluator
-} 
+enum SelectAssistent {
+    socratic,
+    direct,
+    creative,
+    evaluator
+}
 
 @Injectable()
 export class UserService {
@@ -20,24 +20,19 @@ export class UserService {
                     OR: [
                         { email: identifier },
                         { username: identifier }
-                    ]
-                }
-            })
+                    ]}})
             if (!user) throw new UnauthorizedException('user not found')
             return { message: "user found", statusbar: 200, user, sucess: true }
-
-
         } catch (e) {
             return { message: "internal server error", status: 500, sucess: false }
         }
     }
 
-    async updateUser(identifier,assistant){
-   
-
-
+    async updateUser(name?: string, bio?: string, assistant?: string) {
+        const data: any = {};
+        if (name !== undefined) data.name = name;
+        if (bio !== undefined) data.bio = bio;
+        if (assistant !== undefined) data.assistant = assistant;
+        return await this.prisma.user.updateMany({data});
     }
-
-
-
 }
