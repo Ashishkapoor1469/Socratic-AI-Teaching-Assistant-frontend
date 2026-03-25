@@ -57,6 +57,7 @@ export default function Profile() {
     email: ""
   })
   const [selectedAssistant, setSelectedAssistant] = useState("socratic")
+  console.log(selectedAssistant)
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
