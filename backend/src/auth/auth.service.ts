@@ -35,7 +35,8 @@ export class AuthService {
                     name,
                     username,
                     email,
-                    password: hash
+                    password: hash,
+                    bio:""
                 }
             })
 

@@ -1,5 +1,13 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common"
 import { PrismaService } from "../prisma/primsa.service"
+
+ enum SelectAssistent {
+socratic,
+direct,
+creative,
+evaluator
+} 
+
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) { }
@@ -24,8 +32,12 @@ export class UserService {
         }
     }
 
-    async updateUser(identifier){
+    async updateUser(identifier,assistant){
    
+
+
     }
+
+
 
 }
