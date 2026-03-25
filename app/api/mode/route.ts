@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
     const payload = { assistent: body.mode };
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://closefistedly-ditriglyphic-tameika.ngrok-free.dev/api'}/user/update`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/user/update', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
