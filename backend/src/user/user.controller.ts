@@ -14,7 +14,7 @@ export class UserController {
     @Post("update")
     async updateUser(@Body() body: { name?: string, bio?: string, assistent?: string }) {
         const { assistent, bio, name } = body
-        return this.userService.updateUser(name, bio, name)
+        return this.userService.updateUser(name, bio, assistent)
     }
 
 
